@@ -485,13 +485,16 @@ export default class PaymentRequest {
       }
 
       // Try to dismiss the UI
-      NativePayments.abort()
-        .then((_bool) => {
-          this._closePaymentRequest();
-          // Return `undefined` as proposed in the spec.
-          return resolve(undefined);
-        })
-        .catch((_err) => reject(new Error('InvalidStateError')));
+      NativePayments.abort(err => {
+        if (err) {
+          return reject(new Error('InvalidStateError'));
+        }
+
+        this._closePaymentRequest();
+
+        // Return `undefined` as proposed in the spec.
+        return resolve(undefined);
+      });
     });
   }
 
